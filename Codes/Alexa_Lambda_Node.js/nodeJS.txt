@@ -1,0 +1,216 @@
+const Alexa = require('ask-sdk-core');
+const https = require('https');
+
+/* INTENT HANDLERS */
+
+const LaunchRequestHandler = {
+  canHandle(handlerInput) {
+    return handlerInput.requestEnvelope.request.type === 'LaunchRequest';
+  },
+  handle(handlerInput) {
+    return handlerInput.responseBuilder
+      .speak('Welcome to Manishs Smart Inventory Management Skill. ' +
+        'Would you like to get product types/weights, room temperature or humidity readings?')
+      .reprompt('What parameter reading are you looking for ?')
+      .getResponse();
+  },
+};
+
+
+const GetProductIntentHandler = {
+  canHandle(handlerInput) {
+     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+       && handlerInput.requestEnvelope.request.intent.name === 'GetProductIntent';
+
+  },
+  async handle(handlerInput) {
+    
+    const response = await httpGet();
+    console.log(response);
+    var obtained = handlerInput.requestEnvelope.request.intent.slots.Productinfo.value;
+    var decoded = "";
+    obtained = obtained.toLowerCase();
+   
+    if (obtained==='name'){
+        decoded='field1';
+        return handlerInput.responseBuilder
+            .speak("The " + obtained + " of the product is " + response[decoded])
+            .reprompt("What would you like?")
+            .getResponse();
+    }
+    
+    else if (obtained==='unit'){
+        decoded='field2';
+        return handlerInput.responseBuilder
+            .speak("The " + obtained + " weight of the product is " + response[decoded] + " grams")
+            .reprompt("What would you like?")
+            .getResponse();
+    }
+    
+     else if (obtained==='total'){
+        decoded='field3';
+        return handlerInput.responseBuilder
+            .speak("The " + obtained + " weight of the product is " + response[decoded] + " grams")
+            .reprompt("What would you like?")
+            .getResponse();
+    }
+    
+    else if (obtained==='quantity'){
+        decoded='field4';
+        return handlerInput.responseBuilder
+            .speak("The " + obtained + " of product " + response['field1'] + " is " + response[decoded] + " packets")
+            .reprompt("What would you like?")
+            .getResponse();
+    }
+    
+    else if (obtained==='temperature'){
+        decoded='field6';
+        return handlerInput.responseBuilder
+            .speak("The " + obtained + " in the warehouse is  " + response[decoded] + " degree celsius ")
+            .reprompt("What would you like?")
+            .getResponse();
+    }
+    
+    else if (obtained==='humidity'){
+        decoded='field5';
+        return handlerInput.responseBuilder
+            .speak("The " + obtained + " in the warehouse is " + response[decoded] + " percent")
+            .reprompt("What would you like?")
+            .getResponse();
+    }
+    
+    
+    
+
+    
+  },
+};
+
+
+const HelpIntentHandler = {
+    canHandle(handlerInput) {
+        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+            && handlerInput.requestEnvelope.request.intent.name === 'AMAZON.HelpIntent';
+    },
+    handle(handlerInput) {
+        const speakOutput = 'You can say hello to me! How can I help?';
+
+        return handlerInput.responseBuilder
+            .speak(speakOutput)
+            .reprompt("What would you like?")
+            .getResponse();
+    },
+};
+
+const CancelAndStopIntentHandler = {
+    canHandle(handlerInput) {
+        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+            && (handlerInput.requestEnvelope.request.intent.name === 'AMAZON.CancelIntent'
+                || handlerInput.requestEnvelope.request.intent.name === 'AMAZON.StopIntent');
+    },
+    handle(handlerInput) {
+        const speakOutput = 'Goodbye!';
+        return handlerInput.responseBuilder
+            .speak(speakOutput)
+            .getResponse();
+    },
+};
+
+
+
+
+const SessionEndedRequestHandler = {
+    canHandle(handlerInput) {
+        return handlerInput.requestEnvelope.request.type === 'SessionEndedRequest';
+    },
+    handle(handlerInput) {
+        // Any cleanup logic goes here.
+        return handlerInput.responseBuilder.getResponse();
+    },
+};
+
+
+const IntentReflectorHandler = {
+    canHandle(handlerInput) {
+        return handlerInput.requestEnvelope.request.type === 'IntentRequest';
+    },
+    handle(handlerInput) {
+        const intentName = handlerInput.requestEnvelope.request.intent.name;
+        const speakOutput = `You just triggered ${intentName}`;
+
+        return handlerInput.responseBuilder
+            .speak(speakOutput)
+            //.reprompt('add a reprompt if you want to keep the session open for the user to respond')
+            .getResponse();
+    },
+};
+
+
+const ErrorHandler = {
+    canHandle() {
+        return true;
+    },
+    handle(handlerInput, error) {
+        console.log(`~~~~ Error handled: ${error.stack}`);
+        const speakOutput = `Sorry, I had trouble doing what you asked. Please try again.`;
+
+        return handlerInput.responseBuilder
+            .speak(speakOutput)
+            .reprompt(speakOutput)
+            .getResponse();
+          
+            
+    },
+};
+
+
+function httpGet() {
+  return new Promise(((resolve, reject) => {
+    //var options = {
+       // host: 'api.icndb.com',
+       // port: 443,
+       // path: '/jokes/random',
+       // method: 'GET',
+    //};
+    
+    //const url = 'https://api.thingspeak.com/channels/33251/feed/last.json?api_key=9VGQ4X79MQJC90RD'
+    const url = 'https://api.thingspeak.com/channels/913110/feeds/last.json?api_key=FRNOMOXSVMFRVVFF'
+    const request = https.get(url, (response) => {
+      response.setEncoding('utf8');
+      let returnData = '';
+
+      response.on('data', (chunk) => {
+        returnData += chunk;
+      });
+
+      response.on('end', () => {
+        resolve(JSON.parse(returnData));
+      });
+
+      response.on('error', (error) => {
+        reject(error);
+      });
+    });
+    request.end();
+  }));
+}
+
+
+
+
+
+const skillBuilder = Alexa.SkillBuilders.custom();
+
+/* LAMBDA SETUP */
+exports.handler = skillBuilder
+  .addRequestHandlers(
+        LaunchRequestHandler,
+     //   HelloWorldIntentHandler,
+        GetProductIntentHandler,
+        HelpIntentHandler,
+        CancelAndStopIntentHandler,
+        SessionEndedRequestHandler,
+        IntentReflectorHandler,
+  )
+  .addErrorHandlers(ErrorHandler)
+  .lambda();

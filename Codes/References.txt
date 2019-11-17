@@ -1,0 +1,12 @@
+
+https://pimylifeup.com/raspberry-pi-rfid-rc522/
+https://pimylifeup.com/raspberry-pi-rfid-attendance-system/
+
+
+http://192.168.0.101/retrieve.php (nginx server)
+
+
+https://www.brainy-bits.com/load-cell-and-hx711-with-arduino/
+
+https://tutorials-raspberrypi.com/digital-raspberry-pi-scale-weight-sensor-hx711/  (primary ref)
+
