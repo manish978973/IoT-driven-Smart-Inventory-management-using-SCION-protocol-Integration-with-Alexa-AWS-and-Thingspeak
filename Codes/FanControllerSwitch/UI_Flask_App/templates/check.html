@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <style>
+       .cent1{
+        align:center;
+        position:absolute;
+        top:20%;
+        left:35%;
+        }
+     p{
+         color : red;
+         }
+    div.b {
+         position:absolute;
+         top:8px;
+         right:16px;
+         font-size:20px;
+         font-family:Arial;
+         }
+           .cent{
+        align:center;
+        position:absolute;
+        top:40%;
+        left:45%;
+        }
+       </style>
+
+
+
+</head>
+<body style="background: Bisque; background-size: 100%;">
+
+
+
+ <h1 class="cent1">SMART INVENTORY MANAGEMENT</h1>
+
+ <div class="b">
+  <p1><a href="/switch">Home</a> </p1>
+</div>
+
+ <div class="cent">
+
+<form method="POST" action="/switch" >
+
+    <div class="form-group" align="center">
+      <!--  Search Members by Group:<br>
+        <input type="text" name="grp" placeholder="Group name" size="30"> -->
+        &nbsp;
+        <input class="btn btn-primary" type="submit" value="Turn on" name="btn" >
+        <input class="btn btn-primary" type="submit" value="Turn off" name="btn" >
+           &nbsp;
+        <p>{{error}}</p>
+       
+        <br>
+        <br>
+        <br>
+
+    </div>
+
+
+</form>
+
+
+ </div>
+
+
+</body>
+</html>
+
