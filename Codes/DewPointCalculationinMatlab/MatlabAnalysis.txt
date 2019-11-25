@@ -1,0 +1,39 @@
+readChannelID = ""; % Channel ID from which you are reading the data    (remove quotes when replaced by value)
+readAPIKey = ''; % Channel read API key from which you are reading the data
+TemperatureFieldID = 6; % Temperature Field ID (varies depends on fields)
+HumidityFieldID = 5; % Humidity Field ID
+[temp,time] = thingSpeakRead(readChannelID,'Fields',TemperatureFieldID, ...
+                                                'NumPoints',1,'ReadKey',readAPIKey); % Read the temperature data (the value 1 is the number of values you intend to calculate dew point for)
+humidity = thingSpeakRead(readChannelID,'Fields',HumidityFieldID, ...
+                                                'NumPoints',1,'ReadKey',readAPIKey); % Read the humidity data (the value 1 is the number of values you intend to calculate dew point for)
+tempC = (5/9)*(temp-32);
+b = 17.62; % constant for water vapor (b)
+c = 243.5; % constant for barometric pressure (c).
+gamma = log(humidity/100)+b*tempC./(c+tempC);
+dewPoint = c*gamma./(b-gamma)
+dewPointF = (dewPoint*1.8) + 32;
+display(dewPointF,'Dew Point is');
+writeChannelID = ""; % Write channel ID (always needs to be written into a new exclusive channel)
+writeAPIKey = ''; % Write channel API Key
+thingSpeakWrite(writeChannelID,[temp,humidity,dewPointF],'Fields',[1,2,3],'timestamp',time,'WriteKey',writeAPIKey);
+
+
+
+
+
+
+
+
+************************************************
+Matlab Visualization for Dew Point
+
+readChId = "" (same channel id which we had used for writing dew point) (remove quotes when replaced by value)
+readKey = ''; (read API key of the above channel)
+[dewPointData,timeStamps] = thingSpeakRead(readChId,'fields',[1,2,3],...
+    'NumPoints',10,'ReadKey',readKey);  (the value 10 is the no of values u intend to visualize)
+plot(timeStamps,dewPointData);
+xlabel('TimeStamps');
+ylabel('Measured Values');
+title('Dew Point Measurement Calculation ');
+legend({'Temperature','Humidity','Dew Point'});
+grid on;
