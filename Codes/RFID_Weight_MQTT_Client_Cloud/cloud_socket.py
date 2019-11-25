@@ -6,10 +6,82 @@ import time
 import sys
 import paho.mqtt.client as paho
 import urllib.request
+import ssl
+
+
+
+
+
+#amazon AWS details
+MQTT_HOST = "afio7p37diyt8-ats.iot.eu-west-1.amazonaws.com"
+CA_ROOT_CERT_FILE = "/home/pi/AmazonRootCA1.pem"
+THING_NAME = "ESP"
+THING_CERT_FILE = "/home/pi/f88bbe537b-certificate.pem.crt"
+THING_PRIVATE_KEY_FILE = "/home/pi/f88bbe537b-private.pem.key"
+
+
+MQTT_PORT = 8883
+MQTT_KEEPALIVE_INTERVAL = 45
+SHADOW_UPDATE_TOPIC = "$aws/things/" + THING_NAME + "/shadow/update"
+SHADOW_UPDATE_ACCEPTED_TOPIC = "$aws/things/" + THING_NAME + "/shadow/update/accepted"
+SHADOW_UPDATE_REJECTED_TOPIC = "$aws/things/" + THING_NAME + "/shadow/update/rejected"
+SHADOW_STATE_DOC_LED_ON = """{"state" : {"desired" : {"LED" : "ON"}}}"""
+SHADOW_STATE_DOC_LED_OFF = """{"state" : {"desired" : {"LED" : "OFF"}}}"""
+SHADOW_GET_TOPIC = "$aws/things/" + THING_NAME + "/shadow/get"
+SHADOW_GET_ACCEPTED_TOPIC = "$aws/things/" + THING_NAME + "/shadow/get/accepted"
+SHADOW_GET_REJECTED_TOPIC = "$aws/things/" + THING_NAME + "/shadow/get/rejected"
+
+
+mqttc = paho.Client("client1")
+
+def on_connect(mqttc, obj,flags, rc):
+        mqttc.subscribe(SHADOW_UPDATE_ACCEPTED_TOPIC, 1)
+        mqttc.subscribe(SHADOW_UPDATE_REJECTED_TOPIC, 1)
+
+
+def on_message(mqttc, obj, msg):
+    if str(msg.topic) == SHADOW_UPDATE_ACCEPTED_TOPIC:
+        print ("\n---SUCCESS---\nShadow State Doc Accepted by AWS IoT.")
+        print ("Response JSON:\n" + str(msg.payload.decode()))
+    elif str(msg.topic) == SHADOW_UPDATE_REJECTED_TOPIC:
+        print ("\n---FAILED---\nShadow State Doc Rejected by AWS IoT.")
+        print ("Error Response JSON:\n" + str(msg.payload.decode()))
+
+
+
+def on_subscribe(mqttc, obj, mid, granted_qos):
+    if mid == 3:
+            # Fetch current Shadow status. Useful for reconnection scenario.
+            mqttc.publish(SHADOW_GET_TOPIC,"",qos=1)
+
+
+mqttc.on_connect = on_connect
+
+mqttc.on_message = on_message
+#mqttc.on_connect = on_connect
+mqttc.on_subscribe = on_subscribe
+
+
+mqttc.tls_set(CA_ROOT_CERT_FILE, certfile=THING_CERT_FILE, keyfile=THING_PRIVATE_KEY_FILE, cert_reqs=ssl.CERT_REQUIRED, tls_version=ssl.PROTOCOL_TLSv1_2, ciphers=None)
+
+# Connect with MQTT Broker
+mqttc.connect(MQTT_HOST, MQTT_PORT, MQTT_KEEPALIVE_INTERVAL)
+mqttc.loop_start()
+
+
+
+
+
+
+
+
+
+
+
 
 
 myAPI = 'N5D2CEV26WIRWUDR'
-baseURL = 'https://api.thingspeak.com/update?api_key=%s' % myAPI 
+baseURL = 'https://api.thingspeak.com/update?api_key=%s' % myAPI
 
 broker="192.168.0.101"
 port=1883
@@ -64,6 +136,8 @@ try:
             val = max(0, int(hx.get_weight(5)))
             #print(val)
             from_server = json.loads(client.recv(4096).decode())
+            if (from_server['Temperature'] > 22):
+                mqttc.publish(SHADOW_UPDATE_TOPIC,SHADOW_STATE_DOC_LED_ON,qos=1)
             quantity = normal_round(int(val) / int(from_server['UnitWeight']))
             jobject = {'Name':from_server['Name'],'UnitWeight':from_server['UnitWeight'],'TotalWeight':val,'Quantity':quantity,'Humidity':from_server['Humidity'],'Temperature':from_server['Temperature']}
             a = json.dumps(jobject)
