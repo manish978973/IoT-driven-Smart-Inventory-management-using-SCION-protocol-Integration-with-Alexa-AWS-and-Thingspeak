@@ -40,6 +40,9 @@ There are several Internet of things (IoT) applications running on legacy networ
 
 * Intially we need to set up a Mysql table to save up our product RFID data , type of the product and unit weight.Once these paramters are designed we run `productinput.py` in Register directory which would register the product.
 * These registered products can be checked by querying the table directly in mysql or accessing the `retieve.php` page in PHP show products directory which basically runs a select query and outputs the contents of the product table.
+
+<Image src="Images/PHP_Products.PNG" class="center" style="width:50%">
+
 * Once the registration process is done,we tend to integrate RFID part, Temperature/Humidity and Load cell part.
 * The DHT11 sensor is connected to Raspberry pi serially via Breadboard to obtain Humdity/Temperature of the area where we implment our setup.
 * The intgeration is done by running 2 independent python programs and coupling it using socket server networking with unique ip and ports employed.One python program acts as the server and outputs Temprature/Humidty readings and Unit weight of the products based on the RFID placed. To start this program run 
@@ -59,16 +62,29 @@ This program is run by running
 which can be found in RFID_Weight_MQTT_Client_Cloud directory.
 * Next we configure and setup Thinkspead channel for our data to be visualized. Please refer the link to configure a channel and alter the specifications as per the paramters.
 * Then we need to setup an account with Amazon AWS. Once done we need to open AWS IoT core and register a thing to proceed. A thing is bascially a virtual representation of our device (Refrigeration fan in our case). Please refer the link to set up a thing and integrte with our setup.
+
+<Image src="Images/AWS_Shadow_Example.PNG" class="center" style="width:50%">
+  <Image src="Images/AWS_ESP_thing.PNG" class="center" style="width:50%">
+  
 * Once AWS thing is setup we tend to update its Shadow state each time whenever we turn on/off the fan.We also configure AWS simple notifcation service to act and notify the end users/warehouse representatives by sending a mail and SMS whenever the refrigeration fan is turned on. Refer the link to setup SNS and the link to get an idea on AWS shadow and its significance.
+
+<Image src="Images/AWS_notification_fan_on.PNG" class="center" style="width:50%">
+ 
+<Image src="Images/AWS_Mail_Notification.PNG" class="center" style="width:50%"> 
+
 * Then we run a code `python3 ledcontroller.py` to control the refrigeration fan connected to pi and based on the AWS thing shadow values obatined.
 * As of now the fan would only switch on once the temperature exceeds a certain limit. We have incorporated addtional enhancements where this refrigeration fan can be manully turned. Some of the methods are
 
 o A Python FLask api server is hosted in Raspberry pi which allows users to turn off/turn off the fan using the web interface.
 o The users have the provision to turnon/turnoff the fan with an Alexa skill controlled over voice command.We have also integrated this   alexa skill with Thingspeak cloud so that the user could fetch our the product/weather details with his/her voice commands.
 
+<Image src="Images/AWS_Mail_Notification.PNG" class="center" style="width:50%"> 
+
 #### Flask API server
 
 Please make sure that Flask framework is installed in Raspberry pi. Run the command `flaskserver.py` in the FanControllerSwitch directory to start the Flask api server and control the Refrigeration fan using the web interface. The fan can be simply be controlled with Command prompt code `newledswitch.py` in CommandPrompt directory in FanControllerSwitch.
+
+<Image src="Images/Flask_WebUI_Switch.PNG" class="center" style="width:50%"> 
 
 
 #### Alexa Skill Kit
@@ -86,7 +102,16 @@ As discussed the Output (product details) can be obatined via Thingspeak channel
 
 Make sure Node-Red is installed in a remote system and connected to the Mosquitto broker in the pi via its MQTT node. This remote MQTT connection in our project has been set up with the help of SCION sig gatway protocol. Please refer the link to install sig gatway. It helps in establishing MQTT connections between 2 remote systems.The data obtained in Node-Red is visualized using Node-Red ui.
 
+
+<Image src="Images/Node-Red_UI.PNG" class="center" style="width:50%"> 
+
 Similarly the data obtained in Thinkspead cloud is visualized using different plots in its respective channel. With Thingspeak we have the provisions to incorporate **Matlab features** and processing into the data obtained in the channel. Using the Temp/Humidity obtained in our channel we have calculated Dew point based on Matlab processing and visualized in another channel. 
+
+<Image src="Images/Productdata1.PNG" class="center" style="width:50%"> 
+  
+  <Image src="Images/Productdata2.PNG" class="center" style="width:50%"> 
+  
+   <Image src="Images/DewPoint.PNG" class="center" style="width:50%"> 
 
 ##### <ins> Fan Operation </ins>
 
