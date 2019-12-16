@@ -4,4 +4,6 @@ There are several Internet of things (IoT) applications running on legacy networ
 
 ## BLOCK AND DEPLOYMENT DIAGRAM
 
+<h1 align="center">
 ![Communication](Images/deployment.png)
+</h1>
