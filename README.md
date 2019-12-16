@@ -24,5 +24,13 @@ There are several Internet of things (IoT) applications running on legacy networ
   <li>
   MFRC522 RFID reader <p>The MFRC522 [9] is a highly integrated reader/writer for contact-less communication. It uses the concept of radio-frequency identification and electromagnetic fields to transfer data over short distances. RFID employed in our project is useful to identify product data for further processing and analyzing. An RFID system uses RFID tags are attached to the object which is to be identified. Key chain and an electromagnetic card has been used in our project which has their own unique identification ids. It has got the following pins which are being utilized namely SDA, SCK, MOSI, MISO, GND, RST.</p>
   </li>
+  
+  <li>
+  DHT11 sensor <p> A DHT11 sensor with operating voltage of 3.5-5.5v and current of 0.3A is opted for serial connection with Rasoberry pi.</p>
+  </li>
+  
+    <li>
+  A mini 9v fan <p> A mini 9V fan is selected which is assumed to be the refrigeration coolant in our setup. It will be operated with wide range of methodologies like Alexa skill, manual operation via API server and temperature when it exceeds certain specified limit.</p>
+  </li>
 </ul>
 </div>
