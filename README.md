@@ -29,7 +29,7 @@ There are several Internet of things (IoT) applications running on legacy networ
   DHT11 sensor <p> A DHT11 sensor with operating voltage of 3.5-5.5v and current of 0.3A is opted for serial connection with Rasoberry pi.</p>
   </li>
   
-    <li>
+ <li>
   A mini 9v fan <p> A mini 9V fan is selected which is assumed to be the refrigeration coolant in our setup. It will be operated with wide range of methodologies like Alexa skill, manual operation via API server and temperature when it exceeds certain specified limit.</p>
   </li>
 </ul>
