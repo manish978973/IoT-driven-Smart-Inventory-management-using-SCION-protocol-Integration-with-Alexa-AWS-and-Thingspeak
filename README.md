@@ -116,20 +116,20 @@ to function and therefore, needs to be enabled using rasp iconfig tool as follow
               o Calculates the weight of the product based on the values obtained from Load cell.
               o Calcualtes the overall weight and the no of quanity based on total weight and unit weight.
               o Publishes all obtained values to remote system running Node-RED (to visualize) via MQTT protocol over SCION sig                         configuration.
-              o Scion Sig can be installed using the link and Mosquitto broker for MQTT can be installed using the link.
+              o Scion Sig can be installed using the [link](https://code.ovgu.de/hausheer/scion-iot/tree/UPS_Failover/UPS_Failover/setup_sig) and Mosquitto [broker](https://appcodelabs.com/introduction-to-iot-build-an-mqtt-server-using-raspberry-pi) for MQTT can be installed using the link.
               o Pubishes these data to the Cloud service Thinkspeak channel that we configure.
               o Auto updates the AWS shadow by turning on the refrigeration fan, whenever the temperature detected is greater than a                     specified threshold ( in our case 22 degree celsius).
               
 This program is run by running
            `python3 cloud_socket.py`
 which can be found in RFID_Weight_MQTT_Client_Cloud directory.
-* Next we configure and setup Thinkspead channel for our data to be visualized. Please refer the link to configure a channel and alter the specifications as per the paramters.
-* Then we need to setup an account with Amazon AWS. Once done we need to open AWS IoT core and register a thing to proceed. A thing is bascially a virtual representation of our device (Refrigeration fan in our case). Please refer the link to set up a thing and integrte with our setup.
+* Next we configure and setup Thinkspead channel for our data to be visualized. Please refer the [link](https://de.mathworks.com/help/thingspeak/collect-data-in-a-new-channel.html) to configure a channel and alter the specifications as per the paramters.
+* Then we need to setup an account with Amazon AWS. Once done we need to open AWS IoT core and register a thing to proceed. A thing is bascially a virtual representation of our device (Refrigeration fan in our case). Please refer the [link](https://docs.aws.amazon.com/iot/latest/developerguide/iot-gs.html) to set up a thing and integrte with our setup.
 
 <Image src="Images/AWS_Shadow_Example.PNG" class="center" style="width:50%">
   <Image src="Images/AWS_ESP_thing.PNG" class="center" style="width:50%">
   
-* Once AWS thing is setup we tend to update its Shadow state each time whenever we turn on/off the fan.We also configure AWS simple notifcation service to act and notify the end users/warehouse representatives by sending a mail and SMS whenever the refrigeration fan is turned on. Refer the link to setup SNS and the link to get an idea on AWS shadow and its significance.
+* Once AWS thing is setup we tend to update its Shadow state each time whenever we turn on/off the fan.We also configure AWS simple notifcation service to act and notify the end users/warehouse representatives by sending a mail and SMS whenever the refrigeration fan is turned on. Refer the [link](https://docs.aws.amazon.com/iot/latest/developerguide/iot-sns-rule.html) to setup SNS and the [link](https://docs.aws.amazon.com/iot/latest/developerguide/iot-device-shadows.html) to get an idea on AWS shadow and its significance.
 
 <Image src="Images/AWS_notification_fan_on.PNG" class="center" style="width:50%">
  
@@ -152,7 +152,7 @@ Please make sure that Flask framework is installed in Raspberry pi. Run the comm
 
 #### Alexa Skill Kit
 
-We tend to integrate ALexa skill with our system. Hence we created a Alexa skill that communicates with Alexa Lambda (serverless computing platform) which in turn communicates with AWS IoT Core to update shadow and turn on/off the refrigeration fan. The skill as discussed is also integrated with another cloud service Thingspeak to fetch out the product details. Hence the end user would be able to get product details like weight/unitweight/type/name/quanitity/temperature and humidity of warehouse and also provisions to turn on/off the refrigeration fan. Make sure the user has enabled the link in his/her alexa skill app. Please refer the link to get an understanding of Alexa SKill kit and link to gain understaning on AWS lambda. The code in the directories Alexa_HomeIoT_skill and Alexa_Lambda_Node.js can be used for reference.
+We tend to integrate ALexa skill with our system. Hence we created a Alexa skill that communicates with Alexa Lambda (serverless computing platform) which in turn communicates with AWS IoT Core to update shadow and turn on/off the refrigeration fan. The skill as discussed is also integrated with another cloud service Thingspeak to fetch out the product details. Hence the end user would be able to get product details like weight/unitweight/type/name/quanitity/temperature and humidity of warehouse and also provisions to turn on/off the refrigeration fan. Make sure the user has enabled the link in his/her alexa skill app. Please refer the [link](http://developer.amazon.com/alexa/console/ask) to get an understanding of Alexa SKill kit and [link](https://docs.aws.amazon.com/lambda/latest/dg/services-alexa.html) to gain understaning on AWS lambda. The code in the directories Alexa_HomeIoT_skill and Alexa_Lambda_Node.js can be used for reference.
 
 
 **Note : Turning off the refrigeration fan has been configured as a manual process considering the saftey factor.Once the temperature is back to normal, we expect warehouse authorities to manually turn off the process. This is the reason why this operation was not automated.**
@@ -163,7 +163,7 @@ We tend to integrate ALexa skill with our system. Hence we created a Alexa skill
 ##### <ins> Product Details Visualization </ins>
 As discussed the Output (product details) can be obatined via Thingspeak channel and Node-Red ui. Audio output is obtained via Amazon echo using alexa skill kit.
 
-Make sure Node-Red is installed in a remote system and connected to the Mosquitto broker in the pi via its MQTT node. This remote MQTT connection in our project has been set up with the help of SCION sig gatway protocol. Please refer the link to install sig gatway. It helps in establishing MQTT connections between 2 remote systems.The data obtained in Node-Red is visualized using Node-Red ui.
+Make sure [NodeRed](https://nodered.org/docs/getting-started/raspberrypi) is installed in a remote system and connected to the Mosquitto broker in the pi via its MQTT node. This remote MQTT connection in our project has been set up with the help of SCION sig gatway protocol. Please refer the link to install sig gatway. It helps in establishing MQTT connections between 2 remote systems.The data obtained in Node-Red is visualized using Node-Red ui.
 
 
 <Image src="Images/Node-Red_UI.PNG" class="center" style="width:50%"> 
