@@ -139,6 +139,7 @@ which can be found in RFID_Weight_MQTT_Client_Cloud directory.
 * As of now the fan would only switch on once the temperature exceeds a certain limit. We have incorporated addtional enhancements where this refrigeration fan can be manully turned. Some of the methods are
 
 o A Python FLask api server is hosted in Raspberry pi which allows users to turn off/turn off the fan using the web interface.
+
 o The users have the provision to turnon/turnoff the fan with an Alexa skill controlled over voice command.We have also integrated this   alexa skill with Thingspeak cloud so that the user could fetch our the product/weather details with his/her voice commands.
 
 <Image src="Images/AWS_Mail_Notification.PNG" class="center" style="width:50%"> 
