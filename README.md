@@ -26,7 +26,7 @@ There are several Internet of things (IoT) applications running on legacy networ
   </li>
   
   <li>
-  DHT11 sensor <p> A DHT11 sensor with operating voltage of 3.5-5.5v and current of 0.3A is opted for serial connection with Rasoberry pi.</p>
+  DHT11 sensor <p> A DHT11 sensor with operating voltage of 3.5-5.5v and current of 0.3A is opted for serial connection with Raspberry pi.</p>
   </li>
   
  <li>
@@ -34,3 +34,67 @@ There are several Internet of things (IoT) applications running on legacy networ
   </li>
 </ul>
 </div>
+
+
+### COMMUNICATION FLOW
+
+* Intially we need to set up a Mysql table to save up our product RFID data , type of the product and unit weight.Once these paramters are designed we run `productinput.py` in Register directory which would register the product.
+* These registered products can be checked by querying the table directly in mysql or accessing the `retieve.php` page in PHP show products directory which basically runs a select query and outputs the contents of the product table.
+* Once the registration process is done,we tend to integrate RFID part, Temperature/Humidity and Load cell part.
+* The DHT11 sensor is connected to Raspberry pi serially via Breadboard to obtain Humdity/Temperature of the area where we implment our setup.
+* The intgeration is done by running 2 independent python programs and coupling it using socket server networking with unique ip and ports employed.One python program acts as the server and outputs Temprature/Humidty readings and Unit weight of the products based on the RFID placed. To start this program run 
+        `python3 mainsocketserverre.py` 
+ which can be found in RFID_DHT11_Socket_Server directory.
+ * Once this values are obtained into the client part using the python socket networking protocol, it is coupled with the weight readings obtained by the Load cell.This is the most signifcant program in this setup since there are multiple functionalites coupled with it.
+ * The client program after obtaining RFID/Tempertaure/Humidity/UnitWeight calculates
+              o Calculates the weight of the product based on the values obtained from Load cell.
+              o Calcualtes the overall weight and the no of quanity based on total weight and unit weight.
+              o Publishes all obtained values to remote system running Node-RED (to visualize) via MQTT protocol over SCION sig                         configuration.
+              o Scion Sig can be installed using the link and Mosquitto broker for MQTT can be installed using the link.
+              o Pubishes these data to the Cloud service Thinkspeak channel that we configure.
+              o Auto updates the AWS shadow by turning on the refrigeration fan, whenever the temperature detected is greater than a                     specified threshold ( in our case 22 degree celsius).
+              
+This program is run by running
+           `python3 cloud_socket.py`
+which can be found in RFID_Weight_MQTT_Client_Cloud directory.
+* Next we configure and setup Thinkspead channel for our data to be visualized. Please refer the link to configure a channel and alter the specifications as per the paramters.
+* Then we need to setup an account with Amazon AWS. Once done we need to open AWS IoT core and register a thing to proceed. A thing is bascially a virtual representation of our device (Refrigeration fan in our case). Please refer the link to set up a thing and integrte with our setup.
+* Once AWS thing is setup we tend to update its Shadow state each time whenever we turn on/off the fan.We also configure AWS simple notifcation service to act and notify the end users/warehouse representatives by sending a mail and SMS whenever the refrigeration fan is turned on. Refer the link to setup SNS and the link to get an idea on AWS shadow and its significance.
+* Then we run a code `python3 ledcontroller.py` to control the refrigeration fan connected to pi and based on the AWS thing shadow values obatined.
+* As of now the fan would only switch on once the temperature exceeds a certain limit. We have incorporated addtional enhancements where this refrigeration fan can be manully turned. Some of the methods are
+
+o A Python FLask api server is hosted in Raspberry pi which allows users to turn off/turn off the fan using the web interface.
+o The users have the provision to turnon/turnoff the fan with an Alexa skill controlled over voice command.We have also integrated this   alexa skill with Thingspeak cloud so that the user could fetch our the product/weather details with his/her voice commands.
+
+#### Flask API server
+
+Please make sure that Flask framework is installed in Raspberry pi. Run the command `flaskserver.py` in the FanControllerSwitch directory to start the Flask api server and control the Refrigeration fan using the web interface. The fan can be simply be controlled with Command prompt code `newledswitch.py` in CommandPrompt directory in FanControllerSwitch.
+
+
+#### Alexa Skill Kit
+
+We tend to integrate ALexa skill with our system. Hence we created a Alexa skill that communicates with Alexa Lambda (serverless computing platform) which in turn communicates with AWS IoT Core to update shadow and turn on/off the refrigeration fan. The skill as discussed is also integrated with another cloud service Thingspeak to fetch out the product details. Hence the end user would be able to get product details like weight/unitweight/type/name/quanitity/temperature and humidity of warehouse and also provisions to turn on/off the refrigeration fan. Make sure the user has enabled the link in his/her alexa skill app. Please refer the link to get an understanding of Alexa SKill kit and link to gain understaning on AWS lambda. The code in the directories Alexa_HomeIoT_skill and Alexa_Lambda_Node.js can be used for reference.
+
+
+**Note : Turning off the refrigeration fan has been configured as a manual process considering the saftey factor.Once the temperature is back to normal, we expect warehouse authorities to manually turn off the process. This is the reason why this operation was not automated.**
+
+### OUTPUT
+
+
+##### <ins> Product Details Visualization </ins>
+As discussed the Output (product details) can be obatined via Thingspeak channel and Node-Red ui. Audio output is obtained via Amazon echo using alexa skill kit.
+
+Make sure Node-Red is installed in a remote system and connected to the Mosquitto broker in the pi via its MQTT node. This remote MQTT connection in our project has been set up with the help of SCION sig gatway protocol. Please refer the link to install sig gatway. It helps in establishing MQTT connections between 2 remote systems.The data obtained in Node-Red is visualized using Node-Red ui.
+
+Similarly the data obtained in Thinkspead cloud is visualized using different plots in its respective channel. With Thingspeak we have the provisions to incorporate **Matlab features** and processing into the data obtained in the channel. Using the Temp/Humidity obtained in our channel we have calculated Dew point based on Matlab processing and visualized in another channel. 
+
+##### <ins> Fan Operation </ins>
+
+As discussed the refrigeration fan will be operated in case of Tempertaure rise , API server and Alexa audio command.
+
+##### <ins> Alexa Audio output </ins>
+
+Alexa resonates the response status and product data based on the question asked and the output obatined from the Thingspeak/AWS cloud
+
+
+
